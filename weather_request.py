@@ -4,14 +4,10 @@ import requests
 def request_weather(url='https://wttr.in/',
                     location='Bishkek',
                     params=None):
-    try:
-        response = requests.get(url=f"{url}{location}", params=params)
-        return (response.text
-                if response.ok
-                else response.status_code)
-    except requests.exceptions.RequestException as e:
-        raise SystemExit(e)
-
+    response = requests.get(url=f"{url}{location}", params=params)
+    response.raise_for_status()
+    return response.text
+    
 
 def main():
 
@@ -26,13 +22,16 @@ def main():
     # For detailed help, please visit https://wttr.in/:help
     parameters = {'FMnqT': '', 'lang': 'ru'}
 
-    for location in locations:
-        print(
-            request_weather(
-                location=location,
-                params=parameters
+    try:
+        for location in locations:
+            print(
+                request_weather(
+                    location=location,
+                    params=parameters
+                    )
                 )
-            )
+    except requests.exceptions.RequestException as e:
+        raise SystemExit(e)
     return
 
 
